@@ -4,12 +4,11 @@ on:
   push:
     branches:
       - main
-
   workflow_dispatch:
 
 jobs:
   build:
-    name: Build Android APK
+    name: Build APK
     runs-on: ubuntu-latest
 
     steps:
@@ -25,14 +24,19 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Grant permission to Gradle
-        run: chmod +x gradlew
+      - name: Install Android packages
+        run: |
+          sdkmanager "platform-tools" \
+          "platforms;android-35" \
+          "build-tools;35.0.0"
 
-      - name: Build Debug APK
-        run: ./gradlew assembleDebug
+      - name: Build APK
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: SecretWordClue-debug-apk
+          name: SecretWordClue-APK
           path: app/build/outputs/apk/debug/app-debug.apk
